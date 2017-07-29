@@ -8,6 +8,11 @@ A simple Android App Exercise which allows fixing some nullability errors to lea
 ## Instructions
 - There are some *.kt (Kotlin source) files with intentional compiler errors and lint warnings
 - In Android Studio, use **Find in Path (Shift-Cmd-F)** to look for **FIXME** and look for contextual instructions there.
+- After fixing all the errors, run the app on device or emulator and see if selecting one of the addresses in list shows up at top as
+**Selected Address**
+- If you get time, run lint in Android Studio (Analyze->Inspect Code) and fix any lint errors (especially Kotlin specific).
+- Note that lint checks such as **Unused Resources** are broken because Studio expects to reference these resources in Java files. So,
+you can ignore some of these checks.
 
 ## Here is a list of files with errors
 - MainActivity.kt
