@@ -9,7 +9,10 @@ import kotlinx.android.synthetic.main.activity_main.view.*
 /**
  * Adapter to show addresses
  */
-class AddressAdapter: RecyclerView.Adapter<AddressViewHolder>() {
+// FIXME Setup onItemSelected() (which is a higher order function) to be nullable.
+// FIXME In case we don't care about click events. Note: This may be a trick question.
+// FIXME Higher order functions make it easy with null checks because it forces caller to set lambda expression.
+class AddressAdapter(val onItemSelected: (item: Address) -> Unit): RecyclerView.Adapter<AddressViewHolder>() {
 
     var list: List<Address> = listOf()
 
@@ -22,6 +25,7 @@ class AddressAdapter: RecyclerView.Adapter<AddressViewHolder>() {
     override fun onBindViewHolder(holder: AddressViewHolder?, position: Int) {
         val address = list[position]
         holder.bind(address)
+        holder.itemView.setOnClickListener { onItemSelected(address) }
     }
 
     override fun getItemCount(): Int = list.size
@@ -37,7 +41,11 @@ class AddressAdapter: RecyclerView.Adapter<AddressViewHolder>() {
 class AddressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(address: Address) {
         itemView.line1_text.text = address.line1
-        itemView.line2_text.text = address.line2
+        with(itemView.line2_text) {
+            // FIXME Write condition to hide line2_text field if data is null or empty
+            text = address.line2
+            visibility = if () View.GONE else View.VISIBLE
+        }
         itemView.city_text.text = address.city
         itemView.state_text.text = address.state
         itemView.zipcode_text.text = address.zipcode
