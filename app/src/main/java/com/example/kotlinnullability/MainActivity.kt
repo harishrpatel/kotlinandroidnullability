@@ -5,18 +5,20 @@ import android.os.*
 import android.support.v7.app.*
 import android.support.v7.widget.*
 import android.util.*
+import android.view.*
 import com.example.kotlinnullability.model.*
 import com.example.kotlinnullability.ui.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
- * TODO: Fix line2 nullability
- *
+ * Shows 100 addresses in a list and allows user to select one and display it at top.
  */
 class MainActivity : AppCompatActivity() {
 
-    val address = Address("100 Main St", /*null*/ "Apt # 10A", "Dallas", "TX", "75000")
+    // FIXME make Address.line2 nullable assuming that some addresses will not provide it
+    val address = Address("100 Main St", null, "Dallas", "TX", "75000")
     lateinit var adapter: AddressAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -29,29 +31,45 @@ class MainActivity : AppCompatActivity() {
 
     private fun populateViews() {
         // address fields
-        line1_text.text = address.line1!!
-        line2_text.text = address.line2
+        populateSelectedAddress(address)
+
+        setupRecyclerView(this)
+    }
+
+    private fun populateSelectedAddress(address: Address) {
+        // FIXME we don't need to handle nullability here
+        line1_text.text = address.line1
+        line2_text.text = address.line2 ?: ""
+        line2_text.visibility = if (address.line2?.isEmpty() ?: true) View.GONE else View.VISIBLE
         city_text.text = address.city
         state_text.text = address.state
         zipcode_text.text = address.zipcode
+    }
 
-        // TODO do this so that it does not crash
-        val ctx: Context? = this
-
-        ctx?.let { abc ->
+    private fun setupRecyclerView(context: Context?) {
+        // FIXME To avoid potential lifecycle crashes:
+        // FIXME Note that we are not checking context if its null.
+        // FIXME These kinds of checks are needed especially when a Fragment tries to access Context by calling getActivity().
+        // FIXME Wrap these next few lines in let { } block with null check.
+        context?.let { ctx ->
             Log.d(TAG, "initializing recycler view")
-            recycler_view.layoutManager = LinearLayoutManager(abc!!, RecyclerView.VERTICAL, false)
-            recycler_view.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+            recycler_view.layoutManager = LinearLayoutManager(ctx, RecyclerView.VERTICAL, false)
+            recycler_view.addItemDecoration(DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL))
             adapter = setupRecyclerAdapter()
             recycler_view.adapter = adapter
-        } ?: throw Exception("null context")
+        } ?: Log.d(TAG, "Show some empty View or something")
     }
 
     private fun setupRecyclerAdapter(): AddressAdapter {
-        adapter = AddressAdapter()
+        // FIXME Complete the constructor arguments so that it builds.
+        // FIXME Basically when user clicks an item from the list, we want to call populateSelectedAddress(address) method.
+        // FIXME Hint: Think Higher Order Functions / Lambda Expressions.
+        adapter = AddressAdapter { address ->
+            populateSelectedAddress(address)
+        }
         val addresses = mutableListOf<Address>()
-        // TODO fix crash here. HINT: It is not a (NPE) null pointer exception.
-        // TODO This was done to illustrate that Kotlin helps with NPEs, but we still have to handle other exceptions.
+        // FIXME fix crash here. HINT: It is not a (NPE) null pointer exception.
+        // FIXME This was done to illustrate that Kotlin helps with NPEs, but we still have to handle other exceptions.
         (1..100).forEach { i ->
             val copyAddress = address.copy(
                     line1 = address.line1.replace("100", (i+100).toString()),
@@ -70,8 +88,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        // TODO fix the compiler warning
-        val TAG = MainActivity::class.java.simpleName
+        // FIXME fix the compiler warning
+        val TAG: String = MainActivity::class.java.simpleName ?: "Main screen"
     }
 }
 
